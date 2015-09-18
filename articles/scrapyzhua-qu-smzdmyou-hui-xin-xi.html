@@ -9,11 +9,11 @@
         <!-- Mobile viewport optimized: j.mp/bplateviewport -->
         <meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1">
 
-        <link rel="stylesheet" type="text/css" href="/theme/gumby.css" />
-        <link rel="stylesheet" type="text/css" href="/theme/style.css" />
-        <link rel="stylesheet" type="text/css" href="/theme/pygment.css" />
+        <link rel="stylesheet" type="text/css" href="http://raven47git.github.io/myblog/theme/gumby.css" />
+        <link rel="stylesheet" type="text/css" href="http://raven47git.github.io/myblog/theme/style.css" />
+        <link rel="stylesheet" type="text/css" href="http://raven47git.github.io/myblog/theme/pygment.css" />
 
-        <script src="/theme/js/libs/modernizr-2.6.2.min.js"></script>
+        <script src="http://raven47git.github.io/myblog/theme/js/libs/modernizr-2.6.2.min.js"></script>
 
 
 
@@ -28,14 +28,14 @@
         <div class="row">
 
           <header id="banner" class="body">
-                  <h1><a href="/">Raven Site <strong></strong></a></h1>
+                  <h1><a href="http://raven47git.github.io/myblog/">Raven Site <strong></strong></a></h1>
           </header><!-- /#banner -->
 
             <div id="navigation" class="navbar row">
               <a href="#" gumby-trigger="#navigation &gt; ul" class="toggle"><i class="icon-menu"></i></a>
              
               <ul class="columns">
-                <li><a href="/">Home</a></li>
+                <li><a href="http://raven47git.github.io/myblog/">Home</a></li>
 
 
               </ul>
@@ -49,7 +49,7 @@
 
             <header>
               <h2 class="entry-title">
-                <a href="/articles/scrapyzhua-qu-smzdmyou-hui-xin-xi.html" rel="bookmark"
+                <a href="http://raven47git.github.io/myblog/articles/scrapyzhua-qu-smzdmyou-hui-xin-xi.html" rel="bookmark"
                    title="Permalink to Scrapy抓取SMZDM优惠信息">Scrapy抓取SMZDM优惠信息</a></h2>
            
             </header>
@@ -58,7 +58,7 @@
                 五 18 九月 2015
               </abbr>
               <address class="vcard author">By 
-                <a class="url fn" href="/author/raven.html"> Raven</a>
+                <a class="url fn" href="http://raven47git.github.io/myblog/author/raven.html"> Raven</a>
               </address>
             </footer><!-- /.post-info -->
             <div class="entry-content">
@@ -73,7 +73,6 @@
 <p>分析下需要抓取的信息，我们需要商品的名称，价格，具体描述和推送时间。</p>
 <p>据此建立我们的items.py</p>
 <div class="highlight"><pre><span class="c"># -*- coding: utf-8 -*-</span>
-
 <span class="kn">from</span> <span class="nn">scrapy.item</span> <span class="kn">import</span> <span class="n">Item</span><span class="p">,</span> <span class="n">Field</span>
 
 <span class="k">class</span> <span class="nc">zdmItem</span><span class="p">(</span><span class="n">Item</span><span class="p">):</span>
@@ -85,9 +84,9 @@
 
 
 <h3>Pipelines</h3>
-<p>定义Pipeline处理item，并保存结果到smzdm.json中,pipelines.py
-    # -<em>- coding:utf-8 -</em>- </p>
-<div class="highlight"><pre><span class="kn">import</span> <span class="nn">json</span>
+<p>定义Pipeline处理item，并保存结果到smzdm.json中,pipelines.py</p>
+<div class="highlight"><pre><span class="c"># -*- coding:utf-8 -*- </span>
+<span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">codecs</span>
 
 <span class="k">class</span> <span class="nc">SmzdmPipeline</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -185,9 +184,9 @@
 
 <h4>Categories</h4>
 <ul class="blank">
-		<li><a href="/category/other.html">Other</a></li>
-		<li><a href="/category/pa-chong.html">爬虫</a></li>
-		<li><a href="/category/web.html">Web</a></li>
+		<li><a href="http://raven47git.github.io/myblog/category/other.html">Other</a></li>
+		<li><a href="http://raven47git.github.io/myblog/category/pa-chong.html">爬虫</a></li>
+		<li><a href="http://raven47git.github.io/myblog/category/web.html">Web</a></li>
 </ul>
 
 
@@ -251,8 +250,8 @@
         (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
     }());
 </script>
-  <script src="/theme/js/libs/jquery-1.9.1.min.js"></script>
-  <script src="/theme/js/libs/gumby.min.js"></script>
-  <script src="/theme/js/plugins.js"></script>
+  <script src="http://raven47git.github.io/myblog/theme/js/libs/jquery-1.9.1.min.js"></script>
+  <script src="http://raven47git.github.io/myblog/theme/js/libs/gumby.min.js"></script>
+  <script src="http://raven47git.github.io/myblog/theme/js/plugins.js"></script>
 </body>
 </html>
