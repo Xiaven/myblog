@@ -46,12 +46,155 @@
         
 
             <article>
-                <a href="http://raven47git.github.io/myblog/articles/hello.html"><h3 class="article-title">Hello</h3></a>
-<h6 class="subheader" title="2015-07-03T00:00:00+08:00">Fri 03 July 2015
+                <a href="http://raven47git.github.io/myblog/articles/ji-yu-pelicande-blogda-jian.html"><h3 class="article-title">基于Pelican的Blog搭建</h3></a>
+<h6 class="subheader" title="2015-09-17T21:06:00+08:00">四 17 九月 2015
 </h6>
 
 
-<p>Hi Raven, this is your python site.</p><p class="subheader">Category: <a href="http://raven47git.github.io/myblog/category/python.html">Python</a>
+<p>记录下小站的搭建过程：</p>
+<h4>1. 简介</h4>
+<p><strong>Pelican</strong></p>
+<p>Pelican是一个用Python语言编写的静态网站生成器，支持使用restructuredText和Markdown写文章，配置灵活，扩展性强，有许多优秀的主题和插件可供使用。</p>
+<p>Pelican 的Github地址是：<a href="https://github.com/getpelican/pelicank">https://github.com/getpelican/pelicank</a></p>
+<p><strong>Github Pages</strong></p>
+<p>GitHub Pages本用于介绍托管在GitHub的项目， 由于空间免费稳定，用来做搭建一个博客再好不过。</p>
+<h4>2. Git的安装与配置</h4>
+<p>安装</p>
+<div class="highlight"><pre>apt-get install git
+</pre></div>
+
+
+<p>配置</p>
+<div class="highlight"><pre>git config --global user.name &quot;xxx&quot;
+git config --global user.emailxxx@gmail.com# mkdir new-project
+</pre></div>
+
+
+<p>查看配置信息</p>
+<div class="highlight"><pre>git config --list
+</pre></div>
+
+
+<h4>3. Pelican的安装与快速向导</h4>
+<p>安装</p>
+<div class="highlight"><pre>pip install pelican 
+pip install markdown
+</pre></div>
+
+
+<p>创建项目目录</p>
+<div class="highlight"><pre>mkdir myblog
+cd myblog
+</pre></div>
+
+
+<p>运行pelican快速向导</p>
+<div class="highlight"><pre>pelican-quickstart
+
+Welcome to pelican-quickstart v3.6.3.
+
+This script will help you create a new Pelican-based website.
+
+Please answer the following questions so this script can generate the files
+needed by Pelican.
+
+
+&gt; Where do you want to create your new web site? [.] 
+&gt; What will be the title of this web site? Raven Site
+&gt; Who will be the author of this web site? Raven
+&gt; What will be the default language of this web site? [en] zh
+&gt; Do you want to specify a URL prefix? e.g., http://example.com   (Y/n) y
+&gt; What is your URL prefix? (see above example; no trailing slash) http://raven47git.github.io    
+&gt; Do you want to enable article pagination? (Y/n) 
+&gt; How many articles per page do you want? [10] 
+&gt; What is your time zone? [Europe/Paris] 
+&gt; Do you want to generate a Fabfile/Makefile to automate generation and publishing? (Y/n) 
+&gt; Do you want an auto-reload &amp; simpleHTTP script to assist with theme and site development? (Y/n) 
+&gt; Do you want to upload your website using FTP? (y/N) 
+&gt; Do you want to upload your website using SSH? (y/N) 
+&gt; Do you want to upload your website using Dropbox? (y/N) 
+&gt; Do you want to upload your website using S3? (y/N) 
+&gt; Do you want to upload your website using Rackspace Cloud Files? (y/N) 
+&gt; Do you want to upload your website using GitHub Pages? (y/N) y
+Done. Your new project is available at /home/raven/python/pelican_env/src/blog
+</pre></div>
+
+
+<p>配置pelicanconf.py,加入如下内容</p>
+<div class="highlight"><pre># Content path
+PATH = &#39;content&#39;
+PAGE_PATHS = [&#39;pages&#39;]
+ARTICLE_PATHS = [&#39;articles&#39;]
+STATIC_PATHS = [&#39;images&#39;, &#39;files&#39;]
+
+# URL
+SITEURL = &#39;http://raven47git.github.io/blog&#39;
+ARTICLE_URL = (&#39;articles/{slug}.html&#39;)
+ARTICLE_SAVE_AS = (&#39;articles/{slug}.html&#39;)
+</pre></div>
+
+
+<p>进入content目录,创建一些相关的内容目录</p>
+<div class="highlight"><pre>mkdir articles files images pages
+</pre></div>
+
+
+<h4>4. 使用MarkDown撰写第一篇Blog</h4>
+<div class="highlight"><pre>cd articles
+vi hello.md
+</pre></div>
+
+
+<p>内容为</p>
+<div class="highlight"><pre><span class="n">Title</span><span class="o">:</span> <span class="n">Hello</span>
+<span class="n">Date</span><span class="o">:</span> <span class="mi">2015</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">17</span> <span class="mi">20</span><span class="o">:</span><span class="mi">32</span>
+<span class="n">Category</span><span class="o">:</span> <span class="n">Other</span> 
+<span class="n">Author</span><span class="o">:</span> <span class="n">Raven</span> 
+<span class="n">Summary</span><span class="o">:</span> <span class="n">hello</span>
+
+<span class="n">Hello</span><span class="o">,</span><span class="n">everyone</span><span class="o">!</span>
+</pre></div>
+
+
+<p>编译页面</p>
+<div class="highlight"><pre>make html
+</pre></div>
+
+
+<p><strong>预览结果</strong>
+直接调用脚本develop_server.sh即可</p>
+<div class="highlight"><pre>./develop_server.sh start
+
+./develop_server.sh stop
+</pre></div>
+
+
+<p>打开<a href="http://localhost:8000/">http://localhost:8000/</a>即可看到生成的页面</p>
+<h4>5. 上传到github pages</h4>
+<div class="highlight"><pre>cd output
+git init
+git remote add origin https://github.com/raven47git/myblog.git
+git add -A
+git commit -m &quot;Update Blog&quot;
+git push -u origin gh-pages
+</pre></div>
+
+
+<h4>6. 其他：</h4>
+<p><strong>主题设置</strong></p>
+<p>下载风格包pelican-themes与插件包pelican-plugins</p>
+<div class="highlight"><pre>git clone https://github.com/getpelican/pelican-themes.git
+git clone https://github.com/getpelican/pelican-plugins.git
+</pre></div>
+
+
+<p>在 中选择一个喜欢的主题， 放入 blog所在文件夹，在配置文件中指定主题名称</p>
+<div class="highlight"><pre>THEME = &#39;zurb-F5-basic&#39;
+</pre></div>
+
+
+<h4>7. 总结</h4>
+<p>一步一步摸索着建起这个Blog，还是蛮有意思的，希望对也想搭一个类似Blog的各位有些帮助。</p><p class="subheader">Category: <a href="http://raven47git.github.io/myblog/category/web.html">Web</a>
 
 </p>
 
@@ -59,6 +202,30 @@
 
             </article>
 
+
+                <hr  class="gradient"/>
+
+
+        
+
+
+            <article>
+                <a href="http://raven47git.github.io/myblog/articles/hello-my-pelican-site.html"><h3 class="article-title">Hello My Pelican Site</h3></a>
+<h6 class="subheader" title="2015-09-17T20:32:00+08:00">四 17 九月 2015
+</h6>
+
+
+<p>小站初建</p><p class="subheader">Category: <a href="http://raven47git.github.io/myblog/category/other.html">Other</a>
+
+</p>
+
+
+
+                <a class="button radius secondary small right" href="http://raven47git.github.io/myblog/articles/hello-my-pelican-site.html">Read More</a>
+                <hr  class="gradient"/>
+            </article>
+
+            <!-- /#posts-list -->
 <div class="pagination-centered">
 <h6 class="subheader">Page 1 of 1</h6>
 
@@ -66,10 +233,6 @@
 
 </p>
 </div>
-
-
-
-            <!-- /#posts-list -->
 
     </div>
     <!-- End Main Content -->
@@ -85,7 +248,8 @@
 		
         <h5 class="sidebar-title">Categories</h5>
         <ul class="side-nav">
-            <li><a href="http://raven47git.github.io/myblog/category/python.html">Python</a></li>
+            <li><a href="http://raven47git.github.io/myblog/category/other.html">Other</a></li>
+            <li><a href="http://raven47git.github.io/myblog/category/web.html">Web</a></li>
    
         </ul>
 
@@ -114,7 +278,7 @@
         <hr />
         <div class="row">
             <div class="large-6 columns">
-              <!--                  <p>Raven Site by Raven</p> -->
+              <!--                  <p>Raven Site by raven</p> -->
             </div>
             </div>
     </div>
