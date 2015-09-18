@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+        <title>Scrapy抓取SMZDM优惠信息</title>
+        <meta charset="utf-8" />
+
+
+        <!-- Mobile viewport optimized: j.mp/bplateviewport -->
+        <meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1">
+
+        <link rel="stylesheet" type="text/css" href="/theme/gumby.css" />
+        <link rel="stylesheet" type="text/css" href="/theme/style.css" />
+        <link rel="stylesheet" type="text/css" href="/theme/pygment.css" />
+
+        <script src="/theme/js/libs/modernizr-2.6.2.min.js"></script>
+
+
+
+
+</head>
+
+<body id="index" class="home">
+
+
+    <div class="container">
+
+        <div class="row">
+
+          <header id="banner" class="body">
+                  <h1><a href="/">Raven Site <strong></strong></a></h1>
+          </header><!-- /#banner -->
+
+            <div id="navigation" class="navbar row">
+              <a href="#" gumby-trigger="#navigation &gt; ul" class="toggle"><i class="icon-menu"></i></a>
+             
+              <ul class="columns">
+                <li><a href="/">Home</a></li>
+
+
+              </ul>
+            </div>
+
+<section id="content" class="body">
+
+   <div class="row">
+        <div class="eleven columns">
+
+
+            <header>
+              <h2 class="entry-title">
+                <a href="/articles/scrapyzhua-qu-smzdmyou-hui-xin-xi.html" rel="bookmark"
+                   title="Permalink to Scrapy抓取SMZDM优惠信息">Scrapy抓取SMZDM优惠信息</a></h2>
+           
+            </header>
+            <footer class="post-info">
+              <abbr class="published" title="2015-09-18T18:32:00+08:00">
+                五 18 九月 2015
+              </abbr>
+              <address class="vcard author">By 
+                <a class="url fn" href="/author/raven.html"> Raven</a>
+              </address>
+            </footer><!-- /.post-info -->
+            <div class="entry-content">
+              <p>SMZDM是一个近几年比较有名的商品推荐类网站。
+最近学习了Scrapy爬虫，今天就拿他试试学习成果，抓取下上面的优惠信息。</p>
+<h3>创建project:</h3>
+<div class="highlight"><pre>scrapy startproject smzdm
+</pre></div>
+
+
+<h3>Items</h3>
+<p>分析下需要抓取的信息，我们需要商品的名称，价格，具体描述和推送时间。</p>
+<p>据此建立我们的items.py</p>
+<div class="highlight"><pre><span class="c"># -*- coding: utf-8 -*-</span>
+
+<span class="kn">from</span> <span class="nn">scrapy.item</span> <span class="kn">import</span> <span class="n">Item</span><span class="p">,</span> <span class="n">Field</span>
+
+<span class="k">class</span> <span class="nc">zdmItem</span><span class="p">(</span><span class="n">Item</span><span class="p">):</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">Field</span><span class="p">()</span>
+    <span class="n">desc</span>  <span class="o">=</span> <span class="n">Field</span><span class="p">()</span>
+    <span class="n">price</span> <span class="o">=</span> <span class="n">Field</span><span class="p">()</span>
+    <span class="n">time</span>  <span class="o">=</span> <span class="n">Field</span><span class="p">()</span>
+</pre></div>
+
+
+<h3>Pipelines</h3>
+<p>定义Pipeline处理item，并保存结果到smzdm.json中,pipelines.py
+    # -<em>- coding:utf-8 -</em>- </p>
+<div class="highlight"><pre><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">codecs</span>
+
+<span class="k">class</span> <span class="nc">SmzdmPipeline</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file</span> <span class="o">=</span> <span class="n">codecs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s">&#39;smzdm.json&#39;</span><span class="p">,</span> <span class="s">&#39;wb&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s">&#39;utf-8&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">process_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="n">spider</span><span class="p">):</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">item</span><span class="p">))</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s">&quot;unicode_escape&quot;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">item</span>
+</pre></div>
+
+
+<h3>settings</h3>
+<p>settings.py中主要是对爬虫进行配置，这里加上pipeline的配置</p>
+<div class="highlight"><pre>ITEM_PIPELINES = {
+    &#39;smzdm.pipelines.SmzdmPipeline&#39;:100
+}
+</pre></div>
+
+
+<h3>Spider</h3>
+<p>下面编写我们的Spider</p>
+<p>编写Spider需要考虑下网页的遍历方式，通过观察优惠页面，发现了一种很容易的方式，那就是选择第一篇优惠信息作为start_url，分析上一页的链接，爬取下一个优惠信息。</p>
+<p>对于我们关心的title,price,description,time和link，直接可以利用xpath分析得到。</p>
+<p>spiders/zdmSpider.py</p>
+<div class="highlight"><pre><span class="c"># -*- coding:utf-8 -*-</span>
+
+<span class="kn">from</span> <span class="nn">smzdm.items</span> <span class="kn">import</span> <span class="n">zdmItem</span>
+<span class="kn">from</span> <span class="nn">scrapy.http</span> <span class="kn">import</span> <span class="n">Request</span>
+<span class="kn">from</span> <span class="nn">scrapy.spiders</span> <span class="kn">import</span> <span class="n">Spider</span>
+
+<span class="k">class</span> <span class="nc">zdmSpider</span><span class="p">(</span><span class="n">Spider</span><span class="p">):</span>
+    <span class="n">name</span><span class="o">=</span><span class="s">&quot;zdm&quot;</span>
+
+    <span class="n">allowed_domains</span><span class="o">=</span><span class="p">[</span><span class="s">&quot;smzdm.com&quot;</span><span class="p">]</span>
+    <span class="n">start_urls</span><span class="o">=</span><span class="p">[</span><span class="s">&quot;http://www.smzdm.com/p/702599&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">response</span><span class="p">):</span>
+        <span class="n">item</span><span class="o">=</span><span class="n">zdmItem</span><span class="p">()</span>
+        <span class="n">title</span><span class="o">=</span><span class="n">response</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s">&#39;//h1/text()&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">extract</span><span class="p">()</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">&#39;utf-8&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span>
+        <span class="n">link</span> <span class="o">=</span><span class="n">response</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s">&#39;//div[@class=&quot;pre_next_article&quot;]/span[1]/a/@href&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">extract</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s">&#39;//h1/span/text()&#39;</span><span class="p">))</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+            <span class="n">price</span><span class="o">=</span><span class="n">response</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s">&#39;//h1/span/text()&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">extract</span><span class="p">()</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">price</span><span class="o">=</span><span class="s">&quot;&quot;</span>
+        <span class="n">desc</span><span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s">&#39;//p[@itemprop=&quot;description&quot;]/text() | //p[@itemprop=&quot;description&quot;]/a/text() | //p[@itemprop=&quot;description&quot;]/strong/text()&#39;</span><span class="p">)</span>
+        <span class="n">item</span><span class="p">[</span><span class="s">&#39;desc&#39;</span><span class="p">]</span><span class="o">=</span><span class="s">&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">des</span> <span class="ow">in</span> <span class="n">desc</span><span class="p">:</span>
+            <span class="n">item</span><span class="p">[</span><span class="s">&#39;desc&#39;</span><span class="p">]</span><span class="o">+=</span><span class="n">des</span><span class="o">.</span><span class="n">extract</span><span class="p">()</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">&#39;utf-8&#39;</span><span class="p">)</span>
+
+        <span class="n">item</span><span class="p">[</span><span class="s">&#39;title&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">title</span>
+        <span class="n">item</span><span class="p">[</span><span class="s">&#39;price&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">price</span>
+        <span class="n">item</span><span class="p">[</span><span class="s">&#39;time&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">response</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s">&#39;//span[@class=&quot;lrTime&quot;]/text()&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">extract</span><span class="p">()</span>
+
+        <span class="k">yield</span> <span class="n">item</span> 
+        <span class="k">yield</span> <span class="n">Request</span><span class="p">(</span><span class="n">link</span><span class="p">)</span>
+</pre></div>
+
+
+<h4>结果</h4>
+<p>运行爬虫：</p>
+<div class="highlight"><pre>scrapy crawl zdm
+</pre></div>
+
+
+<p>查看smzdm.json</p>
+<div class="highlight"><pre>{&quot;price&quot;: &quot;2199元包邮，赠摄影包&quot;, &quot;time&quot;: &quot;2015-09-18 13:10&quot;, &quot;desc&quot;: &quot;尼康入门级单反近期好价，配备2代尼克尔18-55mm VR镜头，赠摄影包。D3200是于2012年推出入门机型，是D3100的继任者，虽定位低端但参数一点都不逊色，APS-C 2416万像素CMOS传感器首次搭载在尼康机身上，使之不仅超越了一众入门级竞争者，甚至也超过了其他品牌的中端型号。EXPEED 3图像处理器的搭载让人看出了尼康的诚意，这款处理器之前可是用在D4、D800这样的旗舰身上的。对焦方面采用了Multi-CAM 1000自动对焦模块，中央十字+11点对焦在入门机中也算是厚道。ISO 100-6400，4FPS连拍。可拍摄1080p全高清视频。屏幕为3英寸92万像素，虽然不能翻转，但是已经相当细腻。电池为EN-EL14，续航约540张。另外，D3200还有一个特色可以是搭配无线适配器WU-1a（选购），实现与智能设备（Android）相连接，进行无线传送和远程拍摄，这是非常新颖和方便的特性。标配的镜头为18-55VR II，属于防抖镜头，焦段适中，适合初学者入门使用。易迅网目前抢购价2199元，近期好价，额外赠送摄影包，相比8月推荐价格略高但有赠品优势。D3200延续了系列机身无对焦马达的传统，只能搭载AF-S或AF-I系列镜头才可以实现自动对焦功能，如果购买D型镜头将无法自动对焦，建议用户考虑该点，选购对应的新款G镜头，例如35/1.8G等。&quot;, &quot;title&quot;: &quot;Nikon 尼康 D3200 单反套机（含18-55mm VR II镜头）&quot;}
+{&quot;price&quot;: &quot;过期&quot;, &quot;time&quot;: &quot;2015-09-18 12:11&quot;, &quot;desc&quot;: &quot;买刷头送牙刷，赠品可能随时售罄，手慢无~值友“净角独眼”的推荐理由：“因为之前买了力博得的声波牙刷看今天有活动在找刷头，发现1号店的“920爱牙日”里买刷头送牙刷的分支活动，虽然自用的力博得声波牙刷使用起来力度偏小，基于价格总体来说还是不错的。这次39元购力博得 ELEC电动专用刷头套装（2支装），赠送价值99元的干电池电动牙刷还附带便携盒。3支刷头，值得推荐。”&quot;, &quot;title&quot;: &quot;&quot;}
+{&quot;price&quot;: &quot;89元包邮，买一赠一&quot;, &quot;time&quot;: &quot;2015-09-18 11:51&quot;, &quot;desc&quot;: &quot;适合熟龄肌肤，中样买一赠一。Lancome兰蔻根源补养美容液，为改善肤色的美容液系列，是一款含天然植物提取精华的护肤品。融合红景天、龙胆根、野生山药三种珍贵的植物根部提取物作为配方。通过加强肌肤的新陈代谢而达到改善暗淡发黄气色的功效。为半透明质地，气味芳香不油腻，可快速渗入肌肤、营养肌肤，使肌肤重现光彩，规格50ml。值友“烟柳画桥”反馈：质地偏黏偏厚重，但补水滋润效果好，适合秋冬季节使用。健一网目前此款中样50ml售价89元包邮，参与买一赠一促销，单瓶入手约45元左右，近期好价。中样旅行携带很方便，不过瓶身有“NOTFORSALE”非卖品字样，介意慎拍。&quot;, &quot;title&quot;: &quot;LANCOME 兰蔻 根源补养美容液 中样 50ml&quot;}
+</pre></div>
+            </div><!-- /.entry-content -->
+
+
+        </div><!-- /.eleven.columns -->
+
+<div class="three columns">
+
+<h4>Pages</h4>
+
+ <ul>
+  </ul>
+
+<h4>Categories</h4>
+<ul class="blank">
+		<li><a href="/category/other.html">Other</a></li>
+		<li><a href="/category/pa-chong.html">爬虫</a></li>
+		<li><a href="/category/web.html">Web</a></li>
+</ul>
+
+
+<h4>Tags</h4>
+
+
+<nav class="widget">
+  <h4>Social</h4>
+  <ul class="blank">
+    <li><a href="#">You can add links in your config file</a></li>
+    <li><a href="#">Another social link</a></li>
+  </ul>
+</nav>
+
+</div> </div><!-- /.row -->
+
+
+</section>
+
+       </div><!-- /.row -->
+    </div><!-- /.container -->
+
+
+       <div class="container.nopad bg">
+
+    
+        <footer id="credits" class="row">
+          <div class="seven columns left-center">
+
+                   <address id="about" class="vcard body">
+                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+                    which takes great advantage of <a href="http://python.org">Python</a>.
+                    <br />
+                    Based on the <a target="_blank" href="http://gumbyframework.com">Gumby Framework</a>
+                    </address>
+          </div>
+
+
+          <div class="seven columns">
+            <div class="row">
+              <ul class="socbtns">
+
+
+
+
+
+              </ul>
+            </div>
+          </div>
+        </footer>
+
+    </div>
+
+
+  <script src="/theme/js/libs/jquery-1.9.1.min.js"></script>
+  <script src="/theme/js/libs/gumby.min.js"></script>
+  <script src="/theme/js/plugins.js"></script>
+</body>
+</html>
