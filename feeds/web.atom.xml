@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Raven Site</title><link href="http://raven47git.github.io/fun/" rel="alternate"></link><link href="http://raven47git.github.io/fun/feeds/web.atom.xml" rel="self"></link><id>http://raven47git.github.io/fun/</id><updated>2015-09-17T21:06:00+08:00</updated><entry><title>基于Pelican的Blog搭建</title><link href="http://raven47git.github.io/fun/articles/ji-yu-pelicande-blogda-jian.html" rel="alternate"></link><published>2015-09-17T21:06:00+08:00</published><author><name>Raven</name></author><id>tag:raven47git.github.io,2015-09-17:fun/articles/ji-yu-pelicande-blogda-jian.html</id><summary type="html">&lt;p&gt;记录下小站的搭建过程：&lt;/p&gt;
+&lt;h3&gt;1. 简介&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;Pelican&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Pelican是一个用Python语言编写的静态网站生成器，支持使用restructuredText和Markdown写文章，配置灵活，扩展性强，有许多优秀的主题和插件可供使用。&lt;/p&gt;
+&lt;p&gt;Pelican 的Github地址是：&lt;a href="https://github.com/getpelican/pelican"&gt;https://github.com/getpelican/pelican&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Github Pages&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;GitHub Pages本用于介绍托管在GitHub的项目， 由于空间免费稳定，用来做搭建一个博客再好不过。&lt;/p&gt;
+&lt;p&gt;Github Pages提供了两种Pages模式：&lt;/p&gt;
+&lt;p&gt;1.&lt;strong&gt; User/Organization Pages&lt;/strong&gt; 个人或公司站点&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;使用自己的用户名，每个用户名下面只能建立一个；&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;资源命名必须符合这样的规则username/username.github.com；&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;主干上内容被用来构建和发布页面&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;2.&lt;strong&gt; Project Pages&lt;/strong&gt;项目站点&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;gh-pages分支用于构建和发布；&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;如果user/org pages使用了独立域名，那么托管在账户下的所有project pages将使用相同的域名进行重定向，除非project pages使用了自己的独立域名；&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;如果没有使用独立域名，project pages将通过子路径的形式提供服务username.github.com/projectname；&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;自定义404页面只能在独立域名下使用，否则会使用User Pages 404；&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;这里选用了项目站点, gh-pages这种方式&lt;/p&gt;
+&lt;h3&gt;2. Git的安装与配置&lt;/h3&gt;
+&lt;p&gt;安装&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;apt-get install git
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;配置&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;git config --global user.name &amp;quot;xxx&amp;quot;
+git config --global user.emailxxx@gmail.com
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;配置Git验证 &lt;br /&gt;
+Git的验证方式有Https和SSH两种，这里选用Https, 配置Git的credential helper&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;git config --global credential.helper cache
+git config --global credential.helper &amp;#39;cache --timeout=3600&amp;#39;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;查看配置信息&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;git config --list
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3&gt;3. Pelican的安装与快速向导&lt;/h3&gt;
+&lt;p&gt;安装&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;pip install pelican 
+pip install markdown
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;创建项目目录&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;mkdir myblog
+cd myblog
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;运行pelican快速向导&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;pelican-quickstart
+
+Welcome to pelican-quickstart v3.6.3.
+
+This script will help you create a new Pelican-based website.
+
+Please answer the following questions so this script can generate the files
+needed by Pelican.
+
+
+&amp;gt; Where do you want to create your new web site? [.] 
+&amp;gt; What will be the title of this web site? Raven Site
+&amp;gt; Who will be the author of this web site? Raven
+&amp;gt; What will be the default language of this web site? [en] zh
+&amp;gt; Do you want to specify a URL prefix? e.g., http://example.com   (Y/n) y
+&amp;gt; What is your URL prefix? (see above example; no trailing slash) http://raven47git.github.io    
+&amp;gt; Do you want to enable article pagination? (Y/n) 
+&amp;gt; How many articles per page do you want? [10] 
+&amp;gt; What is your time zone? [Europe/Paris] 
+&amp;gt; Do you want to generate a Fabfile/Makefile to automate generation and publishing? (Y/n) 
+&amp;gt; Do you want an auto-reload &amp;amp; simpleHTTP script to assist with theme and site development? (Y/n) 
+&amp;gt; Do you want to upload your website using FTP? (y/N) 
+&amp;gt; Do you want to upload your website using SSH? (y/N) 
+&amp;gt; Do you want to upload your website using Dropbox? (y/N) 
+&amp;gt; Do you want to upload your website using S3? (y/N) 
+&amp;gt; Do you want to upload your website using Rackspace Cloud Files? (y/N) 
+&amp;gt; Do you want to upload your website using GitHub Pages? (y/N) y
+Done. Your new project is available at /home/raven/python/pelican_env/src/blog
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;配置pelicanconf.py,加入如下内容&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;# Content path
+PATH = &amp;#39;content&amp;#39;
+PAGE_PATHS = [&amp;#39;pages&amp;#39;]
+ARTICLE_PATHS = [&amp;#39;articles&amp;#39;]
+STATIC_PATHS = [&amp;#39;images&amp;#39;, &amp;#39;files&amp;#39;]
+
+# URL
+SITEURL = &amp;#39;http://raven47git.github.io/blog&amp;#39;
+ARTICLE_URL = (&amp;#39;articles/{slug}.html&amp;#39;)
+ARTICLE_SAVE_AS = (&amp;#39;articles/{slug}.html&amp;#39;)
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;进入content目录,创建一些相关的内容目录&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;mkdir articles files images pages
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3&gt;4. 使用Markdown撰写第一篇Blog&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;cd articles
+vi hello.md
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;内容为&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;Title&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;Hello&lt;/span&gt;
+&lt;span class="n"&gt;Date&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;2015&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;09&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;17&lt;/span&gt; &lt;span class="mi"&gt;20&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;32&lt;/span&gt;
+&lt;span class="n"&gt;Category&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;Other&lt;/span&gt; 
+&lt;span class="n"&gt;Author&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;Raven&lt;/span&gt; 
+&lt;span class="n"&gt;Summary&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;hello&lt;/span&gt;
+
+&lt;span class="n"&gt;Hello&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;everyone&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;编译页面&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;make html
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;strong&gt;预览结果&lt;/strong&gt;
+直接调用脚本develop_server.sh即可&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;./develop_server.sh start
+
+./develop_server.sh stop
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;打开&lt;a href="http://localhost:8000/"&gt;http://localhost:8000/&lt;/a&gt;即可看到生成的页面&lt;/p&gt;
+&lt;h3&gt;5. 上传到github pages&lt;/h3&gt;
+&lt;p&gt;首先需要在github主页里创建一个新的repo: myblog, 接下来就生成的页面push到这个repo&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;cd output
+git init
+git checkout --orphan gh-pages
+git remote add origin https://github.com/raven47git/myblog.git
+git add -A
+git commit -m &amp;quot;Update Blog&amp;quot;
+git push -u origin gh-pages
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;现在去 &lt;a href="http://raven47git.github.io/myblog"&gt;http://raven47git.github.io/myblog&lt;/a&gt;即可看到劳动成果啦～～&lt;/p&gt;
+&lt;h3&gt;6. 其他：&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;主题设置&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;下载风格包pelican-themes与插件包pelican-plugins&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;git clone https://github.com/getpelican/pelican-themes.git
+git clone https://github.com/getpelican/pelican-plugins.git
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;在pelican-thems中选择一个喜欢的主题， 放入 blog所在文件夹，在配置文件中指定主题名称&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;THEME = &amp;#39;zurb-F5-basic&amp;#39;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3&gt;7. 总结&lt;/h3&gt;
+&lt;p&gt;一步一步摸索着建起这个Blog，还是蛮有意思的，希望对也想搭一个类似Blog的各位有些帮助。&lt;/p&gt;
+&lt;p&gt;Pelican doc:  &lt;br /&gt;
+&lt;a href="http://pelican.readthedocs.org/en/3.6.3/quickstart.html"&gt;http://pelican.readthedocs.org/en/3.6.3/quickstart.html&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Python Markdown: &lt;br /&gt;
+&lt;a href="http://pythonhosted.org/Markdown/index.html"&gt;http://pythonhosted.org/Markdown/index.html&lt;/a&gt;&lt;/p&gt;</summary></entry></feed>

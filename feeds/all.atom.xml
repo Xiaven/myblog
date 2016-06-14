@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Raven Site</title><link href="http://raven47git.github.io/fun/" rel="alternate"></link><link href="http://raven47git.github.io/fun/feeds/all.atom.xml" rel="self"></link><id>http://raven47git.github.io/fun/</id><updated>2015-09-18T18:32:00+08:00</updated><entry><title>Scrapy抓取SMZDM优惠信息</title><link href="http://raven47git.github.io/fun/articles/scrapyzhua-qu-smzdmyou-hui-xin-xi.html" rel="alternate"></link><published>2015-09-18T18:32:00+08:00</published><author><name>Raven</name></author><id>tag:raven47git.github.io,2015-09-18:fun/articles/scrapyzhua-qu-smzdmyou-hui-xin-xi.html</id><summary type="html">&lt;p&gt;SMZDM是一个近几年比较有名的商品推荐类网站。
+最近学习了Scrapy爬虫，今天就拿他试试学习成果，抓取下上面的优惠信息。&lt;/p&gt;
+&lt;h3&gt;创建project:&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;scrapy startproject smzdm
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3&gt;Items&lt;/h3&gt;
+&lt;p&gt;分析下需要抓取的信息，我们需要商品的名称，价格，具体描述和推送时间。&lt;/p&gt;
+&lt;p&gt;据此建立我们的items.py&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# -*- coding: utf-8 -*-&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;scrapy.item&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;Item&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;Field&lt;/span&gt;
+
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;zdmItem&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Item&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="n"&gt;title&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Field&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+    &lt;span class="n"&gt;desc&lt;/span&gt;  &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Field&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+    &lt;span class="n"&gt;price&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Field&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+    &lt;span class="n"&gt;time&lt;/span&gt;  &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Field&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3&gt;Pipelines&lt;/h3&gt;
+&lt;p&gt;定义Pipeline处理item，并保存结果到smzdm.json中,pipelines.py&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# -*- coding:utf-8 -*- &lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;json&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;codecs&lt;/span&gt;
+
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;SmzdmPipeline&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;object&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;__init__&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;file&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;codecs&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;open&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;smzdm.json&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;wb&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;encoding&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;utf-8&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;process_item&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;item&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;spider&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="n"&gt;line&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;json&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;dumps&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;dict&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;item&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&lt;/span&gt;
+        &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;file&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;line&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;decode&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;unicode_escape&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;item&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3&gt;settings&lt;/h3&gt;
+&lt;p&gt;settings.py中主要是对爬虫进行配置，这里加上pipeline的配置&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;ITEM_PIPELINES = {
+    &amp;#39;smzdm.pipelines.SmzdmPipeline&amp;#39;:100
+}
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3&gt;Spider&lt;/h3&gt;
+&lt;p&gt;下面编写我们的Spider&lt;/p&gt;
+&lt;p&gt;编写Spider需要考虑下网页的遍历方式，通过观察优惠页面，发现了一种很容易的方式，那就是选择第一篇优惠信息作为start_url，分析上一页的链接，爬取下一个优惠信息。&lt;/p&gt;
+&lt;p&gt;对于我们关心的title,price,description,time和link，直接可以利用xpath分析得到。&lt;/p&gt;
+&lt;p&gt;spiders/zdmSpider.py&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# -*- coding:utf-8 -*-&lt;/span&gt;
+
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;smzdm.items&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;zdmItem&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;scrapy.http&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;Request&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;scrapy.spiders&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;Spider&lt;/span&gt;
+
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;zdmSpider&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Spider&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;zdm&amp;quot;&lt;/span&gt;
+
+    &lt;span class="n"&gt;allowed_domains&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;smzdm.com&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+    &lt;span class="n"&gt;start_urls&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;http://www.smzdm.com/p/702599&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;parse&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;response&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="n"&gt;item&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;zdmItem&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+        &lt;span class="n"&gt;title&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;response&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;xpath&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;//h1/text()&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;extract&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;encode&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;utf-8&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;lstrip&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+        &lt;span class="n"&gt;link&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;response&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;xpath&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;//div[@class=&amp;quot;pre_next_article&amp;quot;]/span[1]/a/@href&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;extract&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="nb"&gt;len&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;response&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;xpath&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;//h1/span/text()&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+            &lt;span class="n"&gt;price&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;response&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;xpath&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;//h1/span/text()&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;extract&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;encode&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;utf-8&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="k"&gt;else&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+            &lt;span class="n"&gt;price&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&amp;quot;&lt;/span&gt;
+        &lt;span class="n"&gt;desc&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;response&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;xpath&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;//p[@itemprop=&amp;quot;description&amp;quot;]/text() | //p[@itemprop=&amp;quot;description&amp;quot;]/a/text() | //p[@itemprop=&amp;quot;description&amp;quot;]/strong/text()&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="n"&gt;item&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;desc&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&amp;quot;&lt;/span&gt;
+        &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;des&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;desc&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+            &lt;span class="n"&gt;item&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;desc&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;+=&lt;/span&gt;&lt;span class="n"&gt;des&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;extract&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;encode&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;utf-8&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+        &lt;span class="n"&gt;item&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;title&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;title&lt;/span&gt;
+        &lt;span class="n"&gt;item&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;price&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;price&lt;/span&gt;
+        &lt;span class="n"&gt;item&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;time&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;response&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;xpath&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;//span[@class=&amp;quot;lrTime&amp;quot;]/text()&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;extract&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+
+        &lt;span class="k"&gt;yield&lt;/span&gt; &lt;span class="n"&gt;item&lt;/span&gt; 
+        &lt;span class="k"&gt;yield&lt;/span&gt; &lt;span class="n"&gt;Request&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;link&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h4&gt;结果&lt;/h4&gt;
+&lt;p&gt;运行爬虫：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;scrapy crawl zdm
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;查看smzdm.json&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;{&amp;quot;price&amp;quot;: &amp;quot;2199元包邮，赠摄影包&amp;quot;, &amp;quot;time&amp;quot;: &amp;quot;2015-09-18 13:10&amp;quot;, &amp;quot;desc&amp;quot;: &amp;quot;尼康入门级单反近期好价，配备2代尼克尔18-55mm VR镜头，赠摄影包。D3200是于2012年推出入门机型，是D3100的继任者，虽定位低端但参数一点都不逊色，APS-C 2416万像素CMOS传感器首次搭载在尼康机身上，使之不仅超越了一众入门级竞争者，甚至也超过了其他品牌的中端型号。EXPEED 3图像处理器的搭载让人看出了尼康的诚意，这款处理器之前可是用在D4、D800这样的旗舰身上的。对焦方面采用了Multi-CAM 1000自动对焦模块，中央十字+11点对焦在入门机中也算是厚道。ISO 100-6400，4FPS连拍。可拍摄1080p全高清视频。屏幕为3英寸92万像素，虽然不能翻转，但是已经相当细腻。电池为EN-EL14，续航约540张。另外，D3200还有一个特色可以是搭配无线适配器WU-1a（选购），实现与智能设备（Android）相连接，进行无线传送和远程拍摄，这是非常新颖和方便的特性。标配的镜头为18-55VR II，属于防抖镜头，焦段适中，适合初学者入门使用。易迅网目前抢购价2199元，近期好价，额外赠送摄影包，相比8月推荐价格略高但有赠品优势。D3200延续了系列机身无对焦马达的传统，只能搭载AF-S或AF-I系列镜头才可以实现自动对焦功能，如果购买D型镜头将无法自动对焦，建议用户考虑该点，选购对应的新款G镜头，例如35/1.8G等。&amp;quot;, &amp;quot;title&amp;quot;: &amp;quot;Nikon 尼康 D3200 单反套机（含18-55mm VR II镜头）&amp;quot;}
+{&amp;quot;price&amp;quot;: &amp;quot;过期&amp;quot;, &amp;quot;time&amp;quot;: &amp;quot;2015-09-18 12:11&amp;quot;, &amp;quot;desc&amp;quot;: &amp;quot;买刷头送牙刷，赠品可能随时售罄，手慢无~值友“净角独眼”的推荐理由：“因为之前买了力博得的声波牙刷看今天有活动在找刷头，发现1号店的“920爱牙日”里买刷头送牙刷的分支活动，虽然自用的力博得声波牙刷使用起来力度偏小，基于价格总体来说还是不错的。这次39元购力博得 ELEC电动专用刷头套装（2支装），赠送价值99元的干电池电动牙刷还附带便携盒。3支刷头，值得推荐。”&amp;quot;, &amp;quot;title&amp;quot;: &amp;quot;&amp;quot;}
+{&amp;quot;price&amp;quot;: &amp;quot;89元包邮，买一赠一&amp;quot;, &amp;quot;time&amp;quot;: &amp;quot;2015-09-18 11:51&amp;quot;, &amp;quot;desc&amp;quot;: &amp;quot;适合熟龄肌肤，中样买一赠一。Lancome兰蔻根源补养美容液，为改善肤色的美容液系列，是一款含天然植物提取精华的护肤品。融合红景天、龙胆根、野生山药三种珍贵的植物根部提取物作为配方。通过加强肌肤的新陈代谢而达到改善暗淡发黄气色的功效。为半透明质地，气味芳香不油腻，可快速渗入肌肤、营养肌肤，使肌肤重现光彩，规格50ml。值友“烟柳画桥”反馈：质地偏黏偏厚重，但补水滋润效果好，适合秋冬季节使用。健一网目前此款中样50ml售价89元包邮，参与买一赠一促销，单瓶入手约45元左右，近期好价。中样旅行携带很方便，不过瓶身有“NOTFORSALE”非卖品字样，介意慎拍。&amp;quot;, &amp;quot;title&amp;quot;: &amp;quot;LANCOME 兰蔻 根源补养美容液 中样 50ml&amp;quot;}
+&lt;/pre&gt;&lt;/div&gt;</summary></entry><entry><title>基于Pelican的Blog搭建</title><link href="http://raven47git.github.io/fun/articles/ji-yu-pelicande-blogda-jian.html" rel="alternate"></link><published>2015-09-17T21:06:00+08:00</published><author><name>Raven</name></author><id>tag:raven47git.github.io,2015-09-17:fun/articles/ji-yu-pelicande-blogda-jian.html</id><summary type="html">&lt;p&gt;记录下小站的搭建过程：&lt;/p&gt;
+&lt;h3&gt;1. 简介&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;Pelican&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Pelican是一个用Python语言编写的静态网站生成器，支持使用restructuredText和Markdown写文章，配置灵活，扩展性强，有许多优秀的主题和插件可供使用。&lt;/p&gt;
+&lt;p&gt;Pelican 的Github地址是：&lt;a href="https://github.com/getpelican/pelican"&gt;https://github.com/getpelican/pelican&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Github Pages&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;GitHub Pages本用于介绍托管在GitHub的项目， 由于空间免费稳定，用来做搭建一个博客再好不过。&lt;/p&gt;
+&lt;p&gt;Github Pages提供了两种Pages模式：&lt;/p&gt;
+&lt;p&gt;1.&lt;strong&gt; User/Organization Pages&lt;/strong&gt; 个人或公司站点&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;使用自己的用户名，每个用户名下面只能建立一个；&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;资源命名必须符合这样的规则username/username.github.com；&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;主干上内容被用来构建和发布页面&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;2.&lt;strong&gt; Project Pages&lt;/strong&gt;项目站点&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;gh-pages分支用于构建和发布；&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;如果user/org pages使用了独立域名，那么托管在账户下的所有project pages将使用相同的域名进行重定向，除非project pages使用了自己的独立域名；&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;如果没有使用独立域名，project pages将通过子路径的形式提供服务username.github.com/projectname；&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;自定义404页面只能在独立域名下使用，否则会使用User Pages 404；&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;这里选用了项目站点, gh-pages这种方式&lt;/p&gt;
+&lt;h3&gt;2. Git的安装与配置&lt;/h3&gt;
+&lt;p&gt;安装&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;apt-get install git
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;配置&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;git config --global user.name &amp;quot;xxx&amp;quot;
+git config --global user.emailxxx@gmail.com
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;配置Git验证 &lt;br /&gt;
+Git的验证方式有Https和SSH两种，这里选用Https, 配置Git的credential helper&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;git config --global credential.helper cache
+git config --global credential.helper &amp;#39;cache --timeout=3600&amp;#39;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;查看配置信息&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;git config --list
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3&gt;3. Pelican的安装与快速向导&lt;/h3&gt;
+&lt;p&gt;安装&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;pip install pelican 
+pip install markdown
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;创建项目目录&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;mkdir myblog
+cd myblog
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;运行pelican快速向导&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;pelican-quickstart
+
+Welcome to pelican-quickstart v3.6.3.
+
+This script will help you create a new Pelican-based website.
+
+Please answer the following questions so this script can generate the files
+needed by Pelican.
+
+
+&amp;gt; Where do you want to create your new web site? [.] 
+&amp;gt; What will be the title of this web site? Raven Site
+&amp;gt; Who will be the author of this web site? Raven
+&amp;gt; What will be the default language of this web site? [en] zh
+&amp;gt; Do you want to specify a URL prefix? e.g., http://example.com   (Y/n) y
+&amp;gt; What is your URL prefix? (see above example; no trailing slash) http://raven47git.github.io    
+&amp;gt; Do you want to enable article pagination? (Y/n) 
+&amp;gt; How many articles per page do you want? [10] 
+&amp;gt; What is your time zone? [Europe/Paris] 
+&amp;gt; Do you want to generate a Fabfile/Makefile to automate generation and publishing? (Y/n) 
+&amp;gt; Do you want an auto-reload &amp;amp; simpleHTTP script to assist with theme and site development? (Y/n) 
+&amp;gt; Do you want to upload your website using FTP? (y/N) 
+&amp;gt; Do you want to upload your website using SSH? (y/N) 
+&amp;gt; Do you want to upload your website using Dropbox? (y/N) 
+&amp;gt; Do you want to upload your website using S3? (y/N) 
+&amp;gt; Do you want to upload your website using Rackspace Cloud Files? (y/N) 
+&amp;gt; Do you want to upload your website using GitHub Pages? (y/N) y
+Done. Your new project is available at /home/raven/python/pelican_env/src/blog
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;配置pelicanconf.py,加入如下内容&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;# Content path
+PATH = &amp;#39;content&amp;#39;
+PAGE_PATHS = [&amp;#39;pages&amp;#39;]
+ARTICLE_PATHS = [&amp;#39;articles&amp;#39;]
+STATIC_PATHS = [&amp;#39;images&amp;#39;, &amp;#39;files&amp;#39;]
+
+# URL
+SITEURL = &amp;#39;http://raven47git.github.io/blog&amp;#39;
+ARTICLE_URL = (&amp;#39;articles/{slug}.html&amp;#39;)
+ARTICLE_SAVE_AS = (&amp;#39;articles/{slug}.html&amp;#39;)
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;进入content目录,创建一些相关的内容目录&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;mkdir articles files images pages
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3&gt;4. 使用Markdown撰写第一篇Blog&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;cd articles
+vi hello.md
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;内容为&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;Title&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;Hello&lt;/span&gt;
+&lt;span class="n"&gt;Date&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;2015&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;09&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;17&lt;/span&gt; &lt;span class="mi"&gt;20&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;32&lt;/span&gt;
+&lt;span class="n"&gt;Category&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;Other&lt;/span&gt; 
+&lt;span class="n"&gt;Author&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;Raven&lt;/span&gt; 
+&lt;span class="n"&gt;Summary&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;hello&lt;/span&gt;
+
+&lt;span class="n"&gt;Hello&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;everyone&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;编译页面&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;make html
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;strong&gt;预览结果&lt;/strong&gt;
+直接调用脚本develop_server.sh即可&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;./develop_server.sh start
+
+./develop_server.sh stop
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;打开&lt;a href="http://localhost:8000/"&gt;http://localhost:8000/&lt;/a&gt;即可看到生成的页面&lt;/p&gt;
+&lt;h3&gt;5. 上传到github pages&lt;/h3&gt;
+&lt;p&gt;首先需要在github主页里创建一个新的repo: myblog, 接下来就生成的页面push到这个repo&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;cd output
+git init
+git checkout --orphan gh-pages
+git remote add origin https://github.com/raven47git/myblog.git
+git add -A
+git commit -m &amp;quot;Update Blog&amp;quot;
+git push -u origin gh-pages
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;现在去 &lt;a href="http://raven47git.github.io/myblog"&gt;http://raven47git.github.io/myblog&lt;/a&gt;即可看到劳动成果啦～～&lt;/p&gt;
+&lt;h3&gt;6. 其他：&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;主题设置&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;下载风格包pelican-themes与插件包pelican-plugins&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;git clone https://github.com/getpelican/pelican-themes.git
+git clone https://github.com/getpelican/pelican-plugins.git
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;在pelican-thems中选择一个喜欢的主题， 放入 blog所在文件夹，在配置文件中指定主题名称&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;THEME = &amp;#39;zurb-F5-basic&amp;#39;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3&gt;7. 总结&lt;/h3&gt;
+&lt;p&gt;一步一步摸索着建起这个Blog，还是蛮有意思的，希望对也想搭一个类似Blog的各位有些帮助。&lt;/p&gt;
+&lt;p&gt;Pelican doc:  &lt;br /&gt;
+&lt;a href="http://pelican.readthedocs.org/en/3.6.3/quickstart.html"&gt;http://pelican.readthedocs.org/en/3.6.3/quickstart.html&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Python Markdown: &lt;br /&gt;
+&lt;a href="http://pythonhosted.org/Markdown/index.html"&gt;http://pythonhosted.org/Markdown/index.html&lt;/a&gt;&lt;/p&gt;</summary></entry><entry><title>Hello My Pelican Site</title><link href="http://raven47git.github.io/fun/articles/hello-my-pelican-site.html" rel="alternate"></link><published>2015-09-17T20:32:00+08:00</published><author><name>Raven</name></author><id>tag:raven47git.github.io,2015-09-17:fun/articles/hello-my-pelican-site.html</id><summary type="html">&lt;p&gt;最近发现之前看过的一些东西过了段时间就忘记了，深感技术还是要多总结。&lt;/p&gt;
+&lt;p&gt;今天花了一晚上时间搭了这个基于Pelican的Blog，用来记录平常学习的知识，希望可以坚持下去。&lt;/p&gt;
+&lt;p&gt;&lt;img alt="stay" src="http://raven47git.github.io/fun/images/stay.jpg" /&gt;&lt;/p&gt;</summary></entry></feed>
